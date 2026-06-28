@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple, clean, and highly accessible EMI calculator with a detailed monthly breakdown of principal and interest payments. Mobile-friendly and optimized for elderly users.">
+  <title>EMI Breakdown Calculator</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="app-header">
+    <div class="header-container">
+      <div class="header-text">
+        <h1>EMI Breakdown Calculator</h1>
+        <p class="subtitle">Calculate your monthly loan payments and view a detailed repayment schedule.</p>
+      </div>
+      <!-- Font Size Adjuster for Elderly/Low-Vision Users -->
+      <div class="text-scaler" aria-label="Text size controls">
+        <span id="scale-label" class="scaler-title">Text Size:</span>
+        <div class="scaler-buttons">
+          <button type="button" id="btn-scale-decrease" aria-label="Decrease text size" aria-describedby="scale-label">A−</button>
+          <button type="button" id="btn-scale-reset" aria-label="Reset text size" aria-describedby="scale-label">Reset</button>
+          <button type="button" id="btn-scale-increase" aria-label="Increase text size" aria-describedby="scale-label">A+</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="app-main">
+    <div class="main-container">
+      <!-- Calculator Inputs Form -->
+      <section class="calculator-inputs" aria-labelledby="inputs-title">
+        <div class="section-card">
+          <h2 id="inputs-title" class="section-title">Loan Details</h2>
+          <form id="emi-form" novalidate>
+            <!-- Loan Amount -->
+            <div class="form-group">
+              <label for="loan-amount">Loan Amount</label>
+              <div class="input-wrapper currency-input">
+                <span class="input-prefix" aria-hidden="true">₹</span>
+                <input 
+                  type="number" 
+                  id="loan-amount" 
+                  name="amount" 
+                  min="1" 
+                  max="1000000000" 
+                  placeholder="e.g. 50,000" 
+                  required 
+                  inputmode="numeric"
+                  aria-describedby="amount-helper amount-error"
+                >
+              </div>
+              <span id="amount-helper" class="field-helper" aria-live="polite">Enter the total amount you want to borrow.</span>
+              <span id="amount-words" class="amount-words-display" aria-live="polite"></span>
+              <div id="amount-error" class="error-msg" role="alert" aria-live="assertive">
+                <span aria-hidden="true">❌</span> Please enter a valid loan amount.
+              </div>
+            </div>
+
+            <!-- Interest Rate -->
+            <div class="form-group">
+              <label for="interest-rate">Annual Interest Rate (%)</label>
+              <div class="input-wrapper percent-input">
+                <input 
+                  type="number" 
+                  id="interest-rate" 
+                  name="rate" 
+                  min="0.1" 
+                  max="100" 
+                  step="0.01" 
+                  placeholder="e.g. 7.5" 
+                  required 
+                  inputmode="decimal"
+                  aria-describedby="rate-helper rate-error"
+                >
+                <span class="input-suffix" aria-hidden="true">%</span>
+              </div>
+              <span id="rate-helper" class="field-helper">Enter the annual interest rate.</span>
+              <div id="rate-error" class="error-msg" role="alert" aria-live="assertive">
+                <span aria-hidden="true">❌</span> Please enter a valid interest rate (0.1% to 100%).
+              </div>
+            </div>
+
+            <!-- Time Duration -->
+            <div class="form-group">
+              <span id="duration-label" class="field-label">Loan Duration</span>
+              
+              <!-- Mutually Exclusive Radio Buttons for Duration Unit -->
+              <div class="radio-group" role="radiogroup" aria-labelledby="duration-label">
+                <label class="radio-label">
+                  <input type="radio" name="duration-unit" value="years" checked>
+                  <span>Years</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="duration-unit" value="months">
+                  <span>Months</span>
+                </label>
+              </div>
+
+              <div class="input-wrapper">
+                <input 
+                  type="number" 
+                  id="loan-duration" 
+                  name="duration" 
+                  min="1" 
+                  max="360" 
+                  placeholder="e.g. 5" 
+                  required 
+                  inputmode="numeric"
+                  aria-describedby="duration-helper duration-error"
+                >
+              </div>
+              <span id="duration-helper" class="field-helper">Enter the duration of the loan.</span>
+              <div id="duration-error" class="error-msg" role="alert" aria-live="assertive">
+                <span aria-hidden="true">❌</span> Please enter a valid duration.
+              </div>
+            </div>
+
+            <!-- Start Date (Optional) -->
+            <div class="form-group">
+              <label for="start-date">First Payment Month <span class="optional-tag">(Optional)</span></label>
+              <div class="input-wrapper">
+                <input 
+                  type="month" 
+                  id="start-date" 
+                  name="startDate"
+                  aria-describedby="date-helper"
+                >
+              </div>
+              <span id="date-helper" class="field-helper">Select the month and year you will make the first payment.</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="btn-calculate">Calculate Payments</button>
+              <button type="button" class="btn btn-secondary" id="btn-reset">Reset Form</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- EMI Summary Metrics -->
+      <section class="calculator-results" aria-labelledby="results-title">
+        <div class="section-card results-card" id="results-card">
+          <h2 id="results-title" class="section-title">Calculation Summary</h2>
+          
+          <div class="results-placeholder" id="results-placeholder-view">
+            <div class="placeholder-icon" aria-hidden="true">📊</div>
+            <p>Enter your loan details and click <strong>Calculate Payments</strong> to see your monthly breakdown.</p>
+          </div>
+
+          <div class="results-content hidden" id="results-content-view">
+            <div class="emi-large-display">
+              <span class="emi-label">Monthly EMI Payment</span>
+              <span class="emi-value" id="summary-emi">₹0.00</span>
+            </div>
+
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="summary-label">Principal Amount</span>
+                <span class="summary-val" id="summary-principal">₹0.00</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Total Interest Paid</span>
+                <span class="summary-val highlight-interest" id="summary-interest">₹0.00</span>
+              </div>
+              <div class="summary-item total-payable">
+                <span class="summary-label">Total Amount Payable</span>
+                <span class="summary-val" id="summary-total">₹0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Monthly Breakdown Section -->
+    <section class="breakdown-section" id="breakdown-section" aria-labelledby="breakdown-title">
+      <div class="breakdown-card">
+        <div class="breakdown-header">
+          <div class="breakdown-title-container">
+            <h2 id="breakdown-title">Amortization Schedule</h2>
+            <button type="button" class="btn-export hidden" id="btn-export-excel" aria-label="Export amortization schedule to Excel sheet">
+              <span class="export-icon" aria-hidden="true">📥</span> Export Excel
+            </button>
+          </div>
+          <p class="subtitle">A complete month-by-month breakdown of how your payments are split between principal and interest.</p>
+        </div>
+
+        <div class="table-container" id="breakdown-table-container">
+          <!-- We will render the table here or show an empty state -->
+          <div class="table-placeholder">
+            <p>No breakdown details available. Please calculate your EMI first.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 EMI Breakdown Calculator. Designed for simplicity, clarity, and ease of use.</p>
+  </footer>
+</body>
+</html>
