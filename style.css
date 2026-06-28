@@ -104,6 +104,16 @@ body {
   letter-spacing: -0.025em;
   color: var(--text);
   margin-bottom: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.header-logo {
+  height: 2.2rem;
+  width: 2.2rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .header-text .subtitle {
